@@ -1,4 +1,4 @@
-import { component$ } from '@builder.io/qwik';
+import { Signal, component$ } from '@builder.io/qwik';
 import {
   type DocumentHead,
   routeLoader$,
@@ -6,34 +6,55 @@ import {
   zod$,
   z,
   Form,
+ActionStore,
+DocumentHeadValue,
+DocumentHeadProps,
+Loader,
 } from '@builder.io/qwik-city';
 import styles from './todolist.module.css';
 
-interface ListItem {
-  text: string;
+interface ListItem<E> {
+  text: E;
 }
 
-export const list: ListItem[] = [];
+export const list: Array<ListItem<string>> = [];
 
-export const useListLoader = routeLoader$(() => {
+export const useListLoader: Loader<ListItem<string>[]> = routeLoader$<Array<ListItem<string>>>(() => {
   return list;
 });
 
 export const useAddToListAction = routeAction$(
-  (item) => {
+  (item: {
+    text: string;
+}) => {
     list.push(item);
     return {
       success: true,
     };
   },
-  zod$({
+  zod$<{
+    text: z.ZodString;
+}>({
     text: z.string().trim().min(1),
   })
 );
 
-export default component$(() => {
-  const list = useListLoader();
-  const action = useAddToListAction();
+export default component$<unknown, {}>(() => {
+  const list: Readonly<Signal<Array<ListItem<string>>>> = useListLoader();
+  const action: ActionStore<{
+    success?: boolean | undefined;
+    formErrors?: undefined;
+    fieldErrors?: undefined;
+    failed?: undefined;
+} | {
+    formErrors?: string[] | undefined;
+    fieldErrors?: {
+        text?: string[] | undefined;
+    } | undefined;
+    failed?: true | undefined;
+    success?: undefined;
+}, { text: string; }, false>
+ = useAddToListAction();
 
   return (
     <>
@@ -69,6 +90,6 @@ export default component$(() => {
   );
 });
 
-export const head: DocumentHead = {
+export const head: DocumentHeadValue | ((props: DocumentHeadProps) => DocumentHeadValue) = {
   title: 'Qwik Todo List',
 };

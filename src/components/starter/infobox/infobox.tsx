@@ -1,8 +1,16 @@
-import { Slot, component$ } from '@builder.io/qwik';
+import {
+  FunctionComponent,
+  JSXNode,
+  OnRenderFn,
+  Slot,
+  component$,
+} from '@builder.io/qwik';
 import styles from './infobox.module.css';
 
-export default component$(() => {
-  return (
+const onMount: OnRenderFn<{}> = () => {
+  const titleComponent: JSXNode<
+    string | FunctionComponent<Record<string, unknown>>
+  > = (
     <div class={styles.infobox}>
       <h3>
         <Slot name="title" />
@@ -10,4 +18,6 @@ export default component$(() => {
       <Slot />
     </div>
   );
-});
+  return titleComponent;
+};
+export default component$<unknown, {}>(onMount);

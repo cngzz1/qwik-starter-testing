@@ -1,9 +1,13 @@
-import { component$ } from '@builder.io/qwik';
+import { OnRenderFn, Signal, component$ } from '@builder.io/qwik';
 import { useServerTimeLoader } from '~/routes/layout';
 import styles from './footer.module.css';
 
-export default component$(() => {
-  const serverTime = useServerTimeLoader();
+const onRenderFunction: OnRenderFn<{}> = () => {
+  const serverTime: Readonly<
+    Signal<{
+      date: string;
+    }>
+  > = useServerTimeLoader();
 
   return (
     <footer>
@@ -16,4 +20,5 @@ export default component$(() => {
       </div>
     </footer>
   );
-});
+};
+export default component$<unknown, {}>(onRenderFunction);

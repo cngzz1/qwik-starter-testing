@@ -1,18 +1,25 @@
 import { component$, Slot, useStyles$ } from '@builder.io/qwik';
-import { routeLoader$ } from '@builder.io/qwik-city';
+import { Loader, routeLoader$ } from '@builder.io/qwik-city';
 
 import Header from '~/components/starter/header/header';
 import Footer from '~/components/starter/footer/footer';
 
 import styles from './styles.css?inline';
+import { JSX } from '@builder.io/qwik/jsx-runtime';
 
-export const useServerTimeLoader = routeLoader$(() => {
+const buildDateCallback: () => {
+  date: string;
+} = () => {
   return {
     date: new Date().toISOString(),
   };
-});
-
-export default component$(() => {
+};
+export const useServerTimeLoader: Loader<{
+  date: string;
+}> = routeLoader$<{
+  date: string;
+}>(buildDateCallback);
+const buildAppCallBack: () => JSX.Element = () => {
   useStyles$(styles);
   return (
     <>
@@ -23,4 +30,5 @@ export default component$(() => {
       <Footer />
     </>
   );
-});
+};
+export default component$<unknown, {}>(buildAppCallBack);
